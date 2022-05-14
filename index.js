@@ -1,11 +1,12 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
-const gravity = 0.2
 
 canvas.width = 1024
 canvas.height = 576
 
 c.fillRect(0, 0, canvas.width, canvas.height)
+
+const gravity = 1
 
 class Sprite {
   constructor({ position, velocity }) {
@@ -17,9 +18,9 @@ class Sprite {
     c.fillStyle = 'red'
     c.fillRect(this.position.x, this.position.y, 50, this.height)
   }
-  //(canvas.height) no canvas fica 0 em cima e o tamanho da altura em baixo
   update() {
     this.draw()
+    this.position.x += this.velocity.x
     this.position.y += this.velocity.y
 
     if (this.position.y + this.height + this.velocity.y >= canvas.height) {
@@ -30,19 +31,19 @@ class Sprite {
 
 const player = new Sprite({
   position: {
-    x: 0,
+    x: 200,
     y: 0
   },
   velocity: {
     x: 0,
-    y: 0
+    y: 10
   }
 })
 
 const enemy = new Sprite({
   position: {
-    x: 400,
-    y: 100
+    x: 700,
+    y: 0
   },
   velocity: {
     x: 0,
@@ -52,16 +53,66 @@ const enemy = new Sprite({
 
 console.log(player)
 
+const keys = {
+  a: {
+    pressed: false
+  },
+  d: {
+    pressed: false
+  },
+  ArrowRight: {
+    pressed: false
+  },
+  ArrowLeft: {
+    pressed: false
+  }
+}
+
+let lastKey
+
 function animate() {
   window.requestAnimationFrame(animate)
   c.fillStyle = 'black'
   c.fillRect(0, 0, canvas.width, canvas.height)
   player.update()
   enemy.update()
+
+  player.velocity.x = 0
+  if (keys.a.pressed && lastKey === 'a') {
+    player.velocity.x = -1
+  } else if (keys.d.pressed && lastKey === 'd') {
+    player.velocity.x = 1
+  }
 }
 
 animate()
 
 window.addEventListener('keydown', event => {
-  console.log(event)
+  switch (event.key) {
+    case 'd':
+      keys.d.pressed = true
+      lastKey = 'd'
+      break
+    case 'a':
+      keys.a.pressed = true
+      lastKey = 'a'
+      break
+    case 'w':
+      player.velocity.y = -20
+      break
+    case 's':
+      player.velocity.y = 10
+      break
+  }
+})
+
+window.addEventListener('keyup', event => {
+  switch (event.key) {
+    case 'd':
+      keys.d.pressed = false
+      break
+    case 'a':
+      keys.a.pressed = false
+      break
+  }
 })
