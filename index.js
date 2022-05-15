@@ -8,65 +8,25 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 1
 
-class Sprite {
-  constructor({ position, velocity, color = 'red', offset }) {
-    this.position = position
-    this.velocity = velocity
-    this.width = 50
-    this.height = 150
-    this.lastKey
-    this.attackBoxe = {
-      position: {
-        x: this.position.x,
-        y: this.position.y
-      },
-      offset,
-      width: 100,
-      height: 50
-    }
-    this.color = color
-    this.isAttacking
-    this.health = 100
-  }
-  draw() {
-    c.fillStyle = this.color
-    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+const backgroud = new Sprite({
+  position: {
+    x: 0,
+    y: 0
+  },
+  imageSrc: './img/background.png'
+})
 
-    //attacBoxer
-    if (this.isAttacking) {
-      c.fillStyle = 'green'
-      c.fillRect(
-        this.attackBoxe.position.x,
-        this.attackBoxe.position.y,
-        this.attackBoxe.width,
-        this.attackBoxe.height
-      )
-    }
-  }
-  update() {
-    this.draw()
-    this.attackBoxe.position.x = this.position.x + this.attackBoxe.offset.x
-    this.attackBoxe.position.y = this.position.y
+const shop = new Sprite({
+  position: {
+    x: 630,
+    y: 160
+  },
+  imageSrc: './img/shop.png',
+  scale: 2.5,
+  framesMax: 6
+})
 
-    this.position.x += this.velocity.x
-    this.position.y += this.velocity.y
-
-    if (this.position.y + this.height + this.velocity.y >= canvas.height) {
-      this.velocity.y = 0
-    } else this.velocity.y += gravity
-  }
-  attack() {
-    this.isAttacking = true
-    setTimeout(() => {
-      player.isAttacking = false
-    }, 100)
-    setTimeout(() => {
-      enemy.isAttacking = false
-    }, 100)
-  }
-}
-
-const player = new Sprite({
+const player = new Fighter({
   position: {
     x: 200,
     y: 0
@@ -81,7 +41,7 @@ const player = new Sprite({
   }
 })
 
-const enemy = new Sprite({
+const enemy = new Fighter({
   position: {
     x: 700,
     y: 0
@@ -114,51 +74,14 @@ const keys = {
   }
 }
 
-function rectangularCollision({ rectangle1, rectangle2 }) {
-  return (
-    rectangle1.attackBoxe.position.x + rectangle1.attackBoxe.width >=
-      rectangle2.position.x &&
-    rectangle1.attackBoxe.position.x <=
-      rectangle2.position.x + rectangle2.width &&
-    rectangle1.attackBoxe.position.y + rectangle1.attackBoxe.height >=
-      rectangle2.position.y &&
-    rectangle1.attackBoxe.position.y <=
-      rectangle2.position.y + rectangle2.height
-  )
-}
-
-function determineWinner({ player, enemy,timerId }) {
-  clearTimeout(timerId)
-  document.querySelector('#displayText').style.display = 'flex'
-  if (player.health === enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Tie'
-  } else if (player.health > enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Player 1 Wins'
-  } else if (player.health < enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Player 2 Wins'
-  }
-}
-
-let timer = 60
-let timerId
-function decreseTimer() {
-  if (timer > 0) {
-    timerId = setTimeout(decreseTimer, 1000)
-    timer--
-    document.querySelector('#timer').innerHTML = timer
-  }
-
-  if (timer === 0) {
-    determineWinner({player,enemy,timerId})
-  }
-}
-
 decreseTimer()
 
 function animate() {
   window.requestAnimationFrame(animate)
   c.fillStyle = 'black'
   c.fillRect(0, 0, canvas.width, canvas.height)
+  backgroud.update()
+  shop.update()
   player.update()
   enemy.update()
 
@@ -200,10 +123,18 @@ function animate() {
     player.health -= 10
     document.querySelector('#playerHealth').style.width = player.health + '%'
   }
-
+  // pensar em um jeito de dimunir essa parte do codigo
+  if (player.position.x - enemy.width > enemy.position.x) {
+    console.log(player.attackBoxe.offset.x)
+    player.attackBoxe.offset.x = -50
+    enemy.attackBoxe.offset.x = 0
+  } else if (player.position.x - enemy.width < enemy.position.x) {
+    player.attackBoxe.offset.x = 0
+    enemy.attackBoxe.offset.x = -50
+  }
   //end game based on health
   if (enemy.health <= 0 || player.health <= 0) {
-    determineWinner({player,enemy, timerId})
+    determineWinner({ player, enemy, timerId })
   }
 }
 
