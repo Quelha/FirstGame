@@ -38,6 +38,35 @@ const player = new Fighter({
   offset: {
     x: 0,
     y: 0
+  },
+  imageSrc: './img/samuraiMack/Idle.png',
+  framesMax: 10,
+  scale: 2.5,
+  offset: {
+    x: 215,
+    y: 53
+  },
+  sprites: {
+    idle: {
+      imageSrc: './img/samuraiMack/Idle.png',
+      framesMax: 10
+    },
+    run: {
+      imageSrc: './img/samuraiMack/Run.png',
+      framesMax: 8
+    },
+    jump: {
+      imageSrc: './img/samuraiMack/Jump.png',
+      framesMax: 3
+    },
+    fall: {
+      imageSrc: './img/samuraiMack/Fall.png',
+      framesMax: 3
+    },
+    attack1: {
+      imageSrc: './img/samuraiMack/Attack1.png',
+      framesMax: 7
+    }
   }
 })
 
@@ -54,6 +83,35 @@ const enemy = new Fighter({
   offset: {
     x: -50,
     y: 0
+  },
+  imageSrc: './img/kenji/Idle2.png',
+  framesMax: 10,
+  scale: 2.5,
+  offset: {
+    x: 215,
+    y: 102
+  },
+  sprites: {
+    idle: {
+      imageSrc: './img/kenji/Idle2.png',
+      framesMax: 10
+    },
+    run: {
+      imageSrc: './img/kenji/Run2.png',
+      framesMax: 8
+    },
+    jump: {
+      imageSrc: './img/kenji/Jump2.png',
+      framesMax: 3
+    },
+    fall: {
+      imageSrc: './img/kenji/Fall2.png',
+      framesMax: 3
+    },
+    attack1: {
+      imageSrc: './img/kenji/Attack12.png',
+      framesMax: 7
+    }
   }
 })
 
@@ -87,17 +145,40 @@ function animate() {
 
   player.velocity.x = 0
   enemy.velocity.x = 0
-
+  
+  //player
+  
   if (keys.a.pressed && player.lastKey === 'a') {
     player.velocity.x = -5
+    player.switchSprite('run')
   } else if (keys.d.pressed && player.lastKey === 'd') {
     player.velocity.x = 5
+    player.switchSprite('run')
+  } else {
+    player.switchSprite('idle')
   }
-
+  if (player.velocity.y < 0) {
+    player.switchSprite('jump')
+  } else if (player.velocity.y > 0) {
+    player.switchSprite('fall')
+  }
+  
+  // enemy
+  
   if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
     enemy.velocity.x = -5
+    enemy.switchSprite('run')
   } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight') {
     enemy.velocity.x = 5
+    enemy.switchSprite('run')
+  }else {
+    enemy.switchSprite('idle')
+  }
+
+  if (enemy.velocity.y < 0) {
+    enemy.switchSprite('jump')
+  } else if (enemy.velocity.y > 0) {
+    enemy.switchSprite('fall')
   }
 
   if (
