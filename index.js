@@ -26,6 +26,7 @@ class Sprite {
     }
     this.color = color
     this.isAttacking
+    this.health = 100
   }
   draw() {
     c.fillStyle = this.color
@@ -33,13 +34,13 @@ class Sprite {
 
     //attacBoxer
     if (this.isAttacking) {
-    c.fillStyle = 'green'
-    c.fillRect(
-      this.attackBoxe.position.x,
-      this.attackBoxe.position.y,
-      this.attackBoxe.width,
-      this.attackBoxe.height
-    )
+      c.fillStyle = 'green'
+      c.fillRect(
+        this.attackBoxe.position.x,
+        this.attackBoxe.position.y,
+        this.attackBoxe.width,
+        this.attackBoxe.height
+      )
     }
   }
   update() {
@@ -59,6 +60,9 @@ class Sprite {
     setTimeout(() => {
       player.isAttacking = false
     }, 100)
+    setTimeout(() => {
+      enemy.isAttacking = false
+    }, 100)
   }
 }
 
@@ -72,7 +76,7 @@ const player = new Sprite({
     y: 10
   },
   offset: {
-    x: 0,
+    x: -50,
     y: 0
   }
 })
@@ -88,7 +92,7 @@ const enemy = new Sprite({
   },
   color: 'blue',
   offset: {
-    x: -50,
+    x: 0,
     y: 0
   }
 })
@@ -110,7 +114,7 @@ const keys = {
   }
 }
 
-function rectangularCollision ({rectangle1, rectangle2} ) {
+function rectangularCollision({ rectangle1, rectangle2 }) {
   return (
     rectangle1.attackBoxe.position.x + rectangle1.attackBoxe.width >=
       rectangle2.position.x &&
@@ -153,7 +157,8 @@ function animate() {
     player.isAttacking
   ) {
     player.isAttacking = false
-    console.log('hit')
+    enemy.health -= 10
+    document.querySelector('#enemyHealth').style.width = enemy.health + '%'
   }
 
   if (
@@ -164,9 +169,9 @@ function animate() {
     enemy.isAttacking
   ) {
     enemy.isAttacking = false
-    console.log(' enemy hit')
+    player.health -= 10
+    document.querySelector('#playerHealth').style.width = player.health + '%'
   }
-
 }
 
 animate()
@@ -185,6 +190,9 @@ window.addEventListener('keydown', event => {
     case 'w':
       player.velocity.y = -20
       break
+    case 's':
+      player.velocity.y = 10  
+    break
     case ' ':
       player.attack()
       break
