@@ -8,7 +8,7 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 1
 
-const backgroud = new Sprite({
+const background = new Sprite({
   position: {
     x: 0,
     y: 0
@@ -133,7 +133,7 @@ const enemy = new Fighter({
       framesMax: 3
     },
     death: {
-      imageSrc: './img/kenji/Death.png',
+      imageSrc: './img/kenji/Death2.png',
       framesMax: 7
     }
   },
@@ -164,21 +164,23 @@ const keys = {
   }
 }
 
-decreseTimer()
+decreaseTimer()
 
 function animate() {
   window.requestAnimationFrame(animate)
   c.fillStyle = 'black'
   c.fillRect(0, 0, canvas.width, canvas.height)
-  backgroud.update()
+  background.update()
   shop.update()
+  c.fillStyle = 'rgba(255, 255, 255, 0.15)'
+  c.fillRect(0, 0, canvas.width, canvas.height)
   player.update()
   enemy.update()
 
   player.velocity.x = 0
   enemy.velocity.x = 0
 
-  //player
+  // player movement
 
   if (keys.a.pressed && player.lastKey === 'a') {
     player.velocity.x = -5
@@ -189,14 +191,15 @@ function animate() {
   } else {
     player.switchSprite('idle')
   }
+
+  // jumping
   if (player.velocity.y < 0) {
     player.switchSprite('jump')
   } else if (player.velocity.y > 0) {
     player.switchSprite('fall')
   }
 
-  // enemy
-
+  // Enemy movement
   if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
     enemy.velocity.x = -5
     enemy.switchSprite('run')
@@ -207,12 +210,14 @@ function animate() {
     enemy.switchSprite('idle')
   }
 
+  // jumping
   if (enemy.velocity.y < 0) {
     enemy.switchSprite('jump')
   } else if (enemy.velocity.y > 0) {
     enemy.switchSprite('fall')
   }
 
+  // detect for collision & enemy gets hit
   if (
     rectangularCollision({
       rectangle1: player,
@@ -223,13 +228,18 @@ function animate() {
   ) {
     enemy.takeHit()
     player.isAttacking = false
-    document.querySelector('#enemyHealth').style.width = enemy.health + '%'
+
+    gsap.to('#enemyHealth', {
+      width: enemy.health + '%'
+    })
   }
 
+  // if player misses
   if (player.isAttacking && player.framesCurrent === 4) {
     player.isAttacking = false
   }
 
+  // this is where our player gets hit
   if (
     rectangularCollision({
       rectangle1: enemy,
@@ -240,22 +250,18 @@ function animate() {
   ) {
     player.takeHit()
     enemy.isAttacking = false
-    document.querySelector('#playerHealth').style.width = player.health + '%'
+
+    gsap.to('#playerHealth', {
+      width: player.health + '%'
+    })
   }
-  // pensar em um jeito de dimunir essa parte do codigo
-  /*if (player.position.x - enemy.width > enemy.position.x) {
-    console.log(player.attackBox.offset.x)
-    player.attackBox.offset.x = -50
-    enemy.attackBox.offset.x = 0
-  } else if (player.position.x - enemy.width < enemy.position.x) {
-    player.attackBox.offset.x = 0
-    enemy.attackBox.offset.x = -50
-  }
-  */
+
+  // if player misses
   if (enemy.isAttacking && enemy.framesCurrent === 2) {
     enemy.isAttacking = false
   }
-  //end game based on health
+
+  // end game based on health
   if (enemy.health <= 0 || player.health <= 0) {
     determineWinner({ player, enemy, timerId })
   }
@@ -263,8 +269,8 @@ function animate() {
 
 animate()
 
-window.addEventListener('keydown', event => {
-  if (!player.death) {
+window.addEventListener('keydown', (event) => {
+  if (!player.dead) {
     switch (event.key) {
       case 'd':
         keys.d.pressed = true
@@ -277,15 +283,13 @@ window.addEventListener('keydown', event => {
       case 'w':
         player.velocity.y = -20
         break
-      case 's':
-        player.velocity.y = 10
-        break
       case ' ':
         player.attack()
         break
     }
   }
-  if (!enemy.death) {
+
+  if (!enemy.dead) {
     switch (event.key) {
       case 'ArrowRight':
         keys.ArrowRight.pressed = true
@@ -298,15 +302,15 @@ window.addEventListener('keydown', event => {
       case 'ArrowUp':
         enemy.velocity.y = -20
         break
-      case 'l':
+      case 'ArrowDown':
         enemy.attack()
+
         break
     }
   }
 })
 
-window.addEventListener('keyup', event => {
-  console.log(event.key)
+window.addEventListener('keyup', (event) => {
   switch (event.key) {
     case 'd':
       keys.d.pressed = false
@@ -314,6 +318,10 @@ window.addEventListener('keyup', event => {
     case 'a':
       keys.a.pressed = false
       break
+  }
+
+  // enemy keys
+  switch (event.key) {
     case 'ArrowRight':
       keys.ArrowRight.pressed = false
       break
