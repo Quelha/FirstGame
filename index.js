@@ -66,6 +66,14 @@ const player = new Fighter({
     attack1: {
       imageSrc: './img/samuraiMack/Attack1.png',
       framesMax: 7
+    },
+    takeHit: {
+      imageSrc: './img/samuraiMack/Take Hit.png',
+      framesMax: 3
+    },
+    death: {
+      imageSrc: './img/samuraiMack/Death.png',
+      framesMax: 11
     }
   },
   attackBox: {
@@ -118,6 +126,14 @@ const enemy = new Fighter({
     },
     attack1: {
       imageSrc: './img/kenji/Attack12.png',
+      framesMax: 7
+    },
+    takeHit: {
+      imageSrc: './img/kenji/Take hit2.png',
+      framesMax: 3
+    },
+    death: {
+      imageSrc: './img/kenji/Death.png',
       framesMax: 7
     }
   },
@@ -205,8 +221,8 @@ function animate() {
     player.isAttacking &&
     player.framesCurrent === 4
   ) {
+    enemy.takeHit()
     player.isAttacking = false
-    enemy.health -= 10
     document.querySelector('#enemyHealth').style.width = enemy.health + '%'
   }
 
@@ -222,8 +238,8 @@ function animate() {
     enemy.isAttacking &&
     enemy.framesCurrent === 2
   ) {
+    player.takeHit()
     enemy.isAttacking = false
-    player.health -= 10
     document.querySelector('#playerHealth').style.width = player.health + '%'
   }
   // pensar em um jeito de dimunir essa parte do codigo
@@ -248,40 +264,44 @@ function animate() {
 animate()
 
 window.addEventListener('keydown', event => {
-  console.log(event.key)
-  switch (event.key) {
-    case 'd':
-      keys.d.pressed = true
-      player.lastKey = 'd'
-      break
-    case 'a':
-      keys.a.pressed = true
-      player.lastKey = 'a'
-      break
-    case 'w':
-      player.velocity.y = -20
-      break
-    case 's':
-      player.velocity.y = 10
-      break
-    case ' ':
-      player.attack()
-      break
-
-    case 'ArrowRight':
-      keys.ArrowRight.pressed = true
-      enemy.lastKey = 'ArrowRight'
-      break
-    case 'ArrowLeft':
-      keys.ArrowLeft.pressed = true
-      enemy.lastKey = 'ArrowLeft'
-      break
-    case 'ArrowUp':
-      enemy.velocity.y = -20
-      break
-    case 'l':
-      enemy.attack()
-      break
+  if (!player.death) {
+    switch (event.key) {
+      case 'd':
+        keys.d.pressed = true
+        player.lastKey = 'd'
+        break
+      case 'a':
+        keys.a.pressed = true
+        player.lastKey = 'a'
+        break
+      case 'w':
+        player.velocity.y = -20
+        break
+      case 's':
+        player.velocity.y = 10
+        break
+      case ' ':
+        player.attack()
+        break
+    }
+  }
+  if (!enemy.death) {
+    switch (event.key) {
+      case 'ArrowRight':
+        keys.ArrowRight.pressed = true
+        enemy.lastKey = 'ArrowRight'
+        break
+      case 'ArrowLeft':
+        keys.ArrowLeft.pressed = true
+        enemy.lastKey = 'ArrowLeft'
+        break
+      case 'ArrowUp':
+        enemy.velocity.y = -20
+        break
+      case 'l':
+        enemy.attack()
+        break
+    }
   }
 })
 
