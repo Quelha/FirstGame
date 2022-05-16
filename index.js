@@ -28,7 +28,7 @@ const shop = new Sprite({
 
 const player = new Fighter({
   position: {
-    x: 200,
+    x: 300,
     y: 0
   },
   velocity: {
@@ -67,12 +67,20 @@ const player = new Fighter({
       imageSrc: './img/samuraiMack/Attack1.png',
       framesMax: 7
     }
+  },
+  attackBox: {
+    offset: {
+      x: 0,
+      y: 30
+    },
+    width: 140,
+    height: 100
   }
 })
 
 const enemy = new Fighter({
   position: {
-    x: 700,
+    x: 800,
     y: 0
   },
   velocity: {
@@ -86,10 +94,10 @@ const enemy = new Fighter({
   },
   imageSrc: './img/kenji/Idle2.png',
   framesMax: 10,
-  scale: 2.5,
+  scale: 3,
   offset: {
-    x: 215,
-    y: 102
+    x: 250,
+    y: 155
   },
   sprites: {
     idle: {
@@ -112,6 +120,14 @@ const enemy = new Fighter({
       imageSrc: './img/kenji/Attack12.png',
       framesMax: 7
     }
+  },
+  attackBox: {
+    offset: {
+      x: -90,
+      y: 50
+    },
+    width: 200,
+    height: 50
   }
 })
 
@@ -145,9 +161,9 @@ function animate() {
 
   player.velocity.x = 0
   enemy.velocity.x = 0
-  
+
   //player
-  
+
   if (keys.a.pressed && player.lastKey === 'a') {
     player.velocity.x = -5
     player.switchSprite('run')
@@ -162,16 +178,16 @@ function animate() {
   } else if (player.velocity.y > 0) {
     player.switchSprite('fall')
   }
-  
+
   // enemy
-  
+
   if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
     enemy.velocity.x = -5
     enemy.switchSprite('run')
   } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight') {
     enemy.velocity.x = 5
     enemy.switchSprite('run')
-  }else {
+  } else {
     enemy.switchSprite('idle')
   }
 
@@ -186,11 +202,16 @@ function animate() {
       rectangle1: player,
       rectangle2: enemy
     }) &&
-    player.isAttacking
+    player.isAttacking &&
+    player.framesCurrent === 4
   ) {
     player.isAttacking = false
     enemy.health -= 10
     document.querySelector('#enemyHealth').style.width = enemy.health + '%'
+  }
+
+  if (player.isAttacking && player.framesCurrent === 4) {
+    player.isAttacking = false
   }
 
   if (
@@ -198,20 +219,25 @@ function animate() {
       rectangle1: enemy,
       rectangle2: player
     }) &&
-    enemy.isAttacking
+    enemy.isAttacking &&
+    enemy.framesCurrent === 2
   ) {
     enemy.isAttacking = false
     player.health -= 10
     document.querySelector('#playerHealth').style.width = player.health + '%'
   }
   // pensar em um jeito de dimunir essa parte do codigo
-  if (player.position.x - enemy.width > enemy.position.x) {
-    console.log(player.attackBoxe.offset.x)
-    player.attackBoxe.offset.x = -50
-    enemy.attackBoxe.offset.x = 0
+  /*if (player.position.x - enemy.width > enemy.position.x) {
+    console.log(player.attackBox.offset.x)
+    player.attackBox.offset.x = -50
+    enemy.attackBox.offset.x = 0
   } else if (player.position.x - enemy.width < enemy.position.x) {
-    player.attackBoxe.offset.x = 0
-    enemy.attackBoxe.offset.x = -50
+    player.attackBox.offset.x = 0
+    enemy.attackBox.offset.x = -50
+  }
+  */
+  if (enemy.isAttacking && enemy.framesCurrent === 2) {
+    enemy.isAttacking = false
   }
   //end game based on health
   if (enemy.health <= 0 || player.health <= 0) {
