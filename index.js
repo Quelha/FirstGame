@@ -8,6 +8,9 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 1
 
+let contPlayer = 0
+let contEnemy = 0
+
 const background = new Sprite({
   position: {
     x: 0,
@@ -281,7 +284,14 @@ window.addEventListener('keydown', (event) => {
         player.lastKey = 'a'
         break
       case 'w':
-        player.velocity.y = -20
+        if (player.velocity.y === 0) {
+          player.velocity.y = -20
+          contPlayer++
+          console.log(contPlayer)
+        } else if (contPlayer > 0) {
+          player.velocity.y = -20
+          contPlayer = 0
+        }
         break
       case ' ':
         player.attack()
@@ -300,11 +310,17 @@ window.addEventListener('keydown', (event) => {
         enemy.lastKey = 'ArrowLeft'
         break
       case 'ArrowUp':
-        enemy.velocity.y = -20
+        if (enemy.velocity.y === 0) {
+          enemy.velocity.y = -20
+          contEnemy++
+          console.log(contEnemy)
+        } else if (contEnemy > 0) {
+          enemy.velocity.y = -15
+          contEnemy = 0
+        }
         break
       case 'ArrowDown':
         enemy.attack()
-
         break
     }
   }
