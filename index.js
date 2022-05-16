@@ -293,6 +293,11 @@ window.addEventListener('keydown', (event) => {
           contPlayer = 0
         }
         break
+      case 's':
+        if (player.velocity.y < 0) {
+          player.velocity.y = 10
+        }
+        break
       case ' ':
         player.attack()
         break
@@ -320,6 +325,11 @@ window.addEventListener('keydown', (event) => {
         }
         break
       case 'ArrowDown':
+        if (enemy.velocity.y < 0) {
+          enemy.velocity.y = 10
+        }
+        break
+      case 'l':
         enemy.attack()
         break
     }
